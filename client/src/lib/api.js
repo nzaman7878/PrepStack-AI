@@ -68,4 +68,20 @@ export const evaluateInterviewAnswer = async (data) => {
   return response.data.data;
 };
 
+export const getAdminCache = async () => {
+  const token = localStorage.getItem('token');
+  const response = await api.get('/admin/cache', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
+
+export const clearAdminCache = async (id = 'all') => {
+  const token = localStorage.getItem('token');
+  const response = await api.delete(`/admin/cache/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
+
 export default api;

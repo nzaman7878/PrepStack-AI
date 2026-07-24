@@ -11,7 +11,10 @@ const iconMap = {
   database: Database,
 };
 
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+
 export default function Tracks() {
+  useDocumentTitle('Explore Interview Tracks');
   const { data: tracks, isLoading, error } = useQuery({
     queryKey: ['tracks'],
     queryFn: getTracks,

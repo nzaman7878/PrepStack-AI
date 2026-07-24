@@ -3,6 +3,7 @@ import { getTrack } from '../lib/api';
 import { Link, useParams } from 'react-router';
 import { ArrowLeft, Clock, BarChart, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 export default function TrackDetails() {
   const { trackSlug } = useParams();
@@ -11,6 +12,8 @@ export default function TrackDetails() {
     queryKey: ['track', trackSlug],
     queryFn: () => getTrack(trackSlug),
   });
+
+  useDocumentTitle(track ? `${track.name} Track` : 'Track Details');
 
   if (isLoading) {
     return (

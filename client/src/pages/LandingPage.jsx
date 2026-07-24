@@ -3,7 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Brain, Code, Target } from 'lucide-react';
 
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
+
 export default function LandingPage() {
+  useDocumentTitle('The Ultimate Full Stack Interview Prep');
+  
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* TopNav */}

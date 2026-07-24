@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getTopicContent } from '../lib/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTopicContent, getBookmarks, toggleBookmark } from '../lib/api';
 import { useParams, Link } from 'react-router';
-import { ArrowLeft, BookOpen, Code, Lightbulb, Play, AlertCircle, Copy, Check, Bot } from 'lucide-react';
+import { ArrowLeft, BookOpen, Code, Lightbulb, Play, AlertCircle, Copy, Check, Bot, Bookmark, BookmarkCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 const CodeBlock = ({ title, code, explanation }) => {
   const [copied, setCopied] = useState(false);
@@ -43,11 +44,27 @@ const CodeBlock = ({ title, code, explanation }) => {
 export default function TopicDetails() {
   const { trackSlug, topicSlug } = useParams();
   const [activeTab, setActiveTab] = useState('overview');
+  const queryClient = useQueryClient();
 
-  // We are fetching the content which could take a while if Gemini is generating it
   const { data, isLoading, error } = useQuery({
     queryKey: ['topicContent', topicSlug],
     queryFn: () => getTopicContent(topicSlug),
+  });
+
+  const { data: bookmarkedTopics } = useQuery({
+    queryKey: ['bookmarks'],
+    queryFn: getBookmarks,
+  });
+
+  const isBookmarked = bookmarkedTopics?.some(t => t.slug === topicSlug);
+
+  useDocumentTitle(data ? `${data.name}` : 'Topic Details');
+
+  const bookmarkMutation = useMutation({
+    mutationFn: toggleBookmark,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['bookmarks']);
+    },
   });
 
   if (isLoading) {

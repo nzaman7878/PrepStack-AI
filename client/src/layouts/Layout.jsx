@@ -1,5 +1,5 @@
 import { Outlet, Link } from 'react-router';
-import { Home, Compass, Bookmark, Settings, LogOut, Menu, Map, Search } from 'lucide-react';
+import { Home, Compass, Bookmark, Settings, LogOut, Menu, Map, Search, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Layout() {
@@ -37,6 +37,12 @@ export default function Layout() {
             <Settings className="h-4 w-4" />
             Settings
           </Link>
+          <div className="pt-4 mt-2 border-t border-slate-200">
+            <Link to="/admin" className="flex items-center gap-3 px-3 py-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-medium transition-colors">
+              <Shield className="h-4 w-4" />
+              Admin
+            </Link>
+          </div>
         </nav>
 
         <div className="p-4 border-t">

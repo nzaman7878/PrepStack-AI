@@ -12,6 +12,7 @@ import Roadmap from './pages/Roadmap';
 import Bookmarks from './pages/Bookmarks';
 import Practice from './pages/Practice';
 import Interview from './pages/Interview';
+import Admin from './pages/Admin';
 import AuthContext from './contexts/AuthContext';
 import { useState } from 'react';
 
@@ -32,6 +33,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/roadmap" element={<Roadmap />} />
               <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/admin" element={<Admin />} />
               <Route path="/tracks" element={<Tracks />} />
               <Route path="/tracks/:trackSlug" element={<TrackDetails />} />
               <Route path="/tracks/:trackSlug/interview" element={<Interview />} />
