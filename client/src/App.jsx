@@ -10,6 +10,8 @@ import TrackDetails from './pages/TrackDetails';
 import TopicDetails from './pages/TopicDetails';
 import Roadmap from './pages/Roadmap';
 import Bookmarks from './pages/Bookmarks';
+import Practice from './pages/Practice';
+import Interview from './pages/Interview';
 import AuthContext from './contexts/AuthContext';
 import { useState } from 'react';
 
@@ -32,7 +34,9 @@ function App() {
               <Route path="/bookmarks" element={<Bookmarks />} />
               <Route path="/tracks" element={<Tracks />} />
               <Route path="/tracks/:trackSlug" element={<TrackDetails />} />
+              <Route path="/tracks/:trackSlug/interview" element={<Interview />} />
               <Route path="/tracks/:trackSlug/:topicSlug" element={<TopicDetails />} />
+              <Route path="/tracks/:trackSlug/:topicSlug/practice" element={<Practice />} />
             </Route>
           </Routes>
         </BrowserRouter>

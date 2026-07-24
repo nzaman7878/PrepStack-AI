@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getTopicContent } from '../lib/api';
 import { useParams, Link } from 'react-router';
-import { ArrowLeft, BookOpen, Code, Lightbulb, Play, AlertCircle, Copy, Check } from 'lucide-react';
+import { ArrowLeft, BookOpen, Code, Lightbulb, Play, AlertCircle, Copy, Check, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const CodeBlock = ({ title, code, explanation }) => {
@@ -83,10 +83,17 @@ export default function TopicDetails() {
         Back to Track
       </Link>
 
-      <div className="mb-8">
+      <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl capitalize">
           {topicSlug.replace(/-/g, ' ')}
         </h1>
+        <Link 
+          to={`/tracks/${trackSlug}/${topicSlug}/practice`}
+          className="inline-flex items-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"
+        >
+          <Bot className="mr-2 h-4 w-4" />
+          Practice Quiz
+        </Link>
       </div>
 
       <div className="mb-8 flex overflow-x-auto border-b border-slate-200 hide-scrollbar">

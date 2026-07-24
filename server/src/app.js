@@ -41,12 +41,16 @@ const contentRouter = require('./routes/content.routes');
 const trackRouter = require('./routes/track.routes');
 const topicRouter = require('./routes/topic.routes');
 const bookmarkRouter = require('./routes/bookmark.routes');
+const practiceRouter = require('./routes/practice.routes');
+const interviewRouter = require('./routes/interview.routes');
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/content', contentRouter);
 app.use('/api/v1/tracks', trackRouter);
 app.use('/api/v1/topics', topicRouter);
 app.use('/api/v1/bookmarks', bookmarkRouter);
+app.use('/api/v1/practice', practiceRouter);
+app.use('/api/v1/interview', interviewRouter);
 
 // Global Error Handler
 app.use(errorHandler);

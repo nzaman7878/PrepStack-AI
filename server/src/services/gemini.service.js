@@ -1,5 +1,7 @@
 const ai = require('../config/gemini.config');
 const { buildTopicPrompt } = require('../prompts/topicContent.prompt');
+const { buildPracticeQuizPrompt } = require('../prompts/practiceQuiz.prompt');
+const { buildMockInterviewPrompt, buildInterviewFeedbackPrompt } = require('../prompts/mockInterview.prompt');
 const ApiError = require('../utils/ApiError');
 const logger = require('../utils/logger');
 const env = require('../config/env.config');
@@ -7,19 +9,33 @@ const env = require('../config/env.config');
 class GeminiService {
   /**
    * Generates structured learning content for a given topic
-   * @param {string} topicName 
-   * @param {string} trackName 
-   * @param {string} difficulty 
-   * @returns {Promise<Object>} The generated JSON content
    */
   async generateTopicContent(topicName, trackName, difficulty) {
+    const prompt = buildTopicPrompt(topicName, trackName, difficulty);
+    return this._generateJsonContent(prompt);
+  }
+
+  async generatePracticeQuiz(topicName, trackName, difficulty) {
+    const prompt = buildPracticeQuizPrompt(topicName, trackName, difficulty);
+    return this._generateJsonContent(prompt);
+  }
+
+  async generateMockInterviewQuestion(trackName, difficulty) {
+    const prompt = buildMockInterviewPrompt(trackName, difficulty);
+    return this._generateJsonContent(prompt);
+  }
+
+  async evaluateInterviewAnswer(question, candidateAnswer, idealAnswer, criteria) {
+    const prompt = buildInterviewFeedbackPrompt(question, candidateAnswer, idealAnswer, criteria);
+    return this._generateJsonContent(prompt);
+  }
+
+  async _generateJsonContent(prompt) {
     if (!env.geminiApiKey) {
       throw new ApiError(500, 'Gemini API key is not configured');
     }
 
     try {
-      const prompt = buildTopicPrompt(topicName, trackName, difficulty);
-      
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: prompt,

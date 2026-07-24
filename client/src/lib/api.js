@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
   withCredentials: true, // Need this for cookies (refresh tokens) if implemented later
 });
 
@@ -39,6 +39,30 @@ export const getBookmarks = async () => {
 export const toggleBookmark = async (data) => {
   const token = localStorage.getItem('token');
   const response = await api.post('/bookmarks', data, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
+
+export const getPracticeQuiz = async (topicSlug, difficulty = 'intermediate') => {
+  const token = localStorage.getItem('token');
+  const response = await api.get(`/practice/${topicSlug}/quiz?difficulty=${difficulty}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
+
+export const getMockInterviewQuestion = async (trackSlug, difficulty = 'intermediate') => {
+  const token = localStorage.getItem('token');
+  const response = await api.get(`/interview/${trackSlug}/question?difficulty=${difficulty}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
+
+export const evaluateInterviewAnswer = async (data) => {
+  const token = localStorage.getItem('token');
+  const response = await api.post('/interview/evaluate', data, {
     headers: { Authorization: `Bearer ${token}` }
   });
   return response.data.data;

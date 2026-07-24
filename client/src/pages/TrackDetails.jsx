@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getTrack } from '../lib/api';
 import { Link, useParams } from 'react-router';
-import { ArrowLeft, Clock, BarChart } from 'lucide-react';
+import { ArrowLeft, Clock, BarChart, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TrackDetails() {
@@ -35,9 +35,18 @@ export default function TrackDetails() {
         Back to Tracks
       </Link>
 
-      <div className="mb-12">
-        <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl">{track.name}</h1>
-        <p className="mt-4 max-w-2xl text-xl text-slate-600">{track.description}</p>
+      <div className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl">{track.name}</h1>
+          <p className="mt-4 max-w-2xl text-xl text-slate-600">{track.description}</p>
+        </div>
+        <Link 
+          to={`/tracks/${trackSlug}/interview`}
+          className="inline-flex items-center rounded-xl bg-slate-900 px-6 py-3 text-base font-bold text-white shadow-lg hover:bg-slate-800 hover:-translate-y-0.5 transition-all"
+        >
+          <Bot className="mr-2 h-5 w-5" />
+          Mock Interview
+        </Link>
       </div>
 
       <div className="space-y-6">
