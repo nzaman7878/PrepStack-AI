@@ -12,8 +12,12 @@ export default function Interview() {
   const [currentQuestionData, setCurrentQuestionData] = useState(null);
   
   const messagesEndRef = useRef(null);
-  const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  useEffect(scrollToBottom, [messages]);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ['mockInterview', trackSlug],
