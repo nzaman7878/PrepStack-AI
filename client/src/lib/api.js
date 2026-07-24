@@ -5,6 +5,17 @@ const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -33,18 +44,12 @@ export const registerUser = async (data) => {
 };
 
 export const logoutUser = async () => {
-  const token = localStorage.getItem('token');
-  const response = await api.post('/auth/logout', {}, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.post('/auth/logout');
   return response.data;
 };
 
 export const getMe = async () => {
-  const token = localStorage.getItem('token');
-  const response = await api.get('/auth/me', {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.get('/auth/me');
   return response.data.data;
 };
 
@@ -64,66 +69,42 @@ export const getTopic = async (slug) => {
 };
 
 export const getTopicContent = async (slug, difficulty = 'intermediate') => {
-  const token = localStorage.getItem('token');
-  const response = await api.get(`/content/${slug}/overview?difficulty=${difficulty}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.get(`/content/${slug}/overview?difficulty=${difficulty}`);
   return response.data.data;
 };
 
 export const getBookmarks = async () => {
-  const token = localStorage.getItem('token');
-  const response = await api.get('/bookmarks', {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.get('/bookmarks');
   return response.data.data;
 };
 
 export const toggleBookmark = async (data) => {
-  const token = localStorage.getItem('token');
-  const response = await api.post('/bookmarks', data, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.post('/bookmarks', data);
   return response.data.data;
 };
 
 export const getPracticeQuiz = async (topicSlug, difficulty = 'intermediate') => {
-  const token = localStorage.getItem('token');
-  const response = await api.get(`/practice/${topicSlug}/quiz?difficulty=${difficulty}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.get(`/practice/${topicSlug}/quiz?difficulty=${difficulty}`);
   return response.data.data;
 };
 
 export const getMockInterviewQuestion = async (trackSlug, difficulty = 'intermediate') => {
-  const token = localStorage.getItem('token');
-  const response = await api.get(`/interview/${trackSlug}/question?difficulty=${difficulty}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.get(`/interview/${trackSlug}/question?difficulty=${difficulty}`);
   return response.data.data;
 };
 
 export const evaluateInterviewAnswer = async (data) => {
-  const token = localStorage.getItem('token');
-  const response = await api.post('/interview/evaluate', data, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.post('/interview/evaluate', data);
   return response.data.data;
 };
 
 export const getAdminCache = async () => {
-  const token = localStorage.getItem('token');
-  const response = await api.get('/admin/cache', {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.get('/admin/cache');
   return response.data.data;
 };
 
 export const clearAdminCache = async (id = 'all') => {
-  const token = localStorage.getItem('token');
-  const response = await api.delete(`/admin/cache/${id}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  const response = await api.delete(`/admin/cache/${id}`);
   return response.data.data;
 };
 

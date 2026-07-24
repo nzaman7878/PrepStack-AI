@@ -23,7 +23,7 @@ export default function Login() {
 
     try {
       const data = await loginUser({ email, password });
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.data.accessToken);
       setUser(data.data.user);
       navigate('/dashboard');
     } catch (err) {
