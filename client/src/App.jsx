@@ -5,6 +5,11 @@ import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import Tracks from './pages/Tracks';
+import TrackDetails from './pages/TrackDetails';
+import TopicDetails from './pages/TopicDetails';
+import Roadmap from './pages/Roadmap';
+import Bookmarks from './pages/Bookmarks';
 import AuthContext from './contexts/AuthContext';
 import { useState } from 'react';
 
@@ -23,6 +28,11 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/roadmap" element={<Roadmap />} />
+              <Route path="/bookmarks" element={<Bookmarks />} />
+              <Route path="/tracks" element={<Tracks />} />
+              <Route path="/tracks/:trackSlug" element={<TrackDetails />} />
+              <Route path="/tracks/:trackSlug/:topicSlug" element={<TopicDetails />} />
             </Route>
           </Routes>
         </BrowserRouter>

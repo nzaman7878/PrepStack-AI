@@ -1,5 +1,5 @@
 import { Outlet, Link } from 'react-router';
-import { Home, Compass, Bookmark, Settings, LogOut, Menu } from 'lucide-react';
+import { Home, Compass, Bookmark, Settings, LogOut, Menu, Map, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Layout() {
@@ -25,6 +25,10 @@ export default function Layout() {
             <Compass className="h-4 w-4" />
             Explore Tracks
           </Link>
+          <Link to="/roadmap" className="flex items-center gap-3 px-3 py-2 rounded-md text-muted-foreground hover:bg-secondary/50 hover:text-foreground font-medium transition-colors">
+            <Map className="h-4 w-4" />
+            Roadmap
+          </Link>
           <Link to="/bookmarks" className="flex items-center gap-3 px-3 py-2 rounded-md text-muted-foreground hover:bg-secondary/50 hover:text-foreground font-medium transition-colors">
             <Bookmark className="h-4 w-4" />
             Bookmarks
@@ -45,14 +49,27 @@ export default function Layout() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b bg-background flex items-center px-6 md:hidden">
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
-          <span className="ml-4 font-headline font-bold">PrepStack AI ⭐⭐⭐⭐⭐</span>
+        <header className="h-16 border-b bg-background flex items-center justify-between px-6">
+          <div className="flex items-center">
+            <Button variant="ghost" size="icon" className="md:hidden mr-4">
+              <Menu className="h-5 w-5" />
+            </Button>
+            <span className="md:hidden font-headline font-bold text-lg">PrepStack AI</span>
+          </div>
+          
+          <div className="flex-1 flex justify-end md:justify-start md:ml-4 max-w-md hidden md:flex relative">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input 
+                type="text" 
+                placeholder="Search topics, questions, cheat sheets... (Cmd+K)" 
+                className="w-full h-10 bg-secondary/50 border border-transparent rounded-lg pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-slate-50/50">
           <Outlet />
         </main>
       </div>
