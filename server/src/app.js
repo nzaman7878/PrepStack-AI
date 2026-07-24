@@ -37,7 +37,9 @@ app.use(morgan('dev'));
 
 // Routes
 const authRouter = require('./routes/auth.routes');
+const contentRouter = require('./routes/content.routes');
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/content', contentRouter);
 
 // Global Error Handler
 app.use(errorHandler);
