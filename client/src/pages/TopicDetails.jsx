@@ -101,9 +101,19 @@ export default function TopicDetails() {
       </Link>
 
       <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl capitalize">
-          {topicSlug.replace(/-/g, ' ')}
-        </h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl capitalize">
+            {topicSlug.replace(/-/g, ' ')}
+          </h1>
+          <button 
+            onClick={() => bookmarkMutation.mutate({ itemType: 'topic', slug: topicSlug, title: data.name || topicSlug.replace(/-/g, ' '), link: `/tracks/${trackSlug}/${topicSlug}` })}
+            className="p-2 rounded-full hover:bg-slate-100 transition-colors"
+            title={isBookmarked ? "Remove bookmark" : "Bookmark this topic"}
+            disabled={bookmarkMutation.isPending}
+          >
+            {isBookmarked ? <BookmarkCheck className="h-8 w-8 text-blue-600" /> : <Bookmark className="h-8 w-8 text-slate-400" />}
+          </button>
+        </div>
         <Link 
           to={`/tracks/${trackSlug}/${topicSlug}/practice`}
           className="inline-flex items-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors"

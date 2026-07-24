@@ -5,12 +5,26 @@ import { User, Mail, Settings as SettingsIcon, Shield, Save } from 'lucide-react
 
 export default function Settings() {
   useDocumentTitle('Settings');
-  const { user } = useContext(AuthContext);
+  const { user, login } = useContext(AuthContext); // We might need a way to update context, let's just use query client or assume we have setUser if it's there. Actually, let's just use a mutation and reload or update context.
   const [name, setName] = useState(user?.name || '');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    alert('Profile update functionality coming soon!');
+    setIsUpdating(true);
+    setMessage('');
+    try {
+      const { updateUser } = await import('../lib/api');
+      const updatedUser = await updateUser({ name });
+      // If AuthContext has a setUser, we would call it here. But a window reload works too for MVP.
+      setMessage('Profile updated successfully!');
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (error) {
+      setMessage('Failed to update profile: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -84,13 +98,21 @@ export default function Settings() {
               </div>
             </div>
             
-            <div className="bg-slate-50 px-6 py-4 flex justify-end border-t border-slate-200">
+            <div className="bg-slate-50 px-6 py-4 flex justify-between items-center border-t border-slate-200">
+              <div className="text-sm">
+                {message && (
+                  <span className={message.includes('Failed') ? 'text-red-600' : 'text-green-600'}>
+                    {message}
+                  </span>
+                )}
+              </div>
               <button
                 type="submit"
-                className="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
+                disabled={isUpdating}
+                className="flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-50"
               >
                 <Save className="mr-2 h-4 w-4" />
-                Save Changes
+                {isUpdating ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </form>

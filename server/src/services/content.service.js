@@ -40,11 +40,12 @@ class ContentService {
       contentType: 'overview',
       difficulty,
       content: generationResult.content,
-      generationModel: 'gemini-2.5-flash',
+      generationModel: 'gemini-flash-latest',
       tokenUsage: {
         input: generationResult.usage?.promptTokenCount || 0,
         output: generationResult.usage?.candidatesTokenCount || 0,
       },
+      promptVersion: '1.0',
       cacheStatus: 'fresh',
       generatedAt: new Date()
     });

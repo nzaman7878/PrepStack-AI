@@ -53,6 +53,16 @@ export const getMe = async () => {
   return response.data.data;
 };
 
+export const updateUser = async (data) => {
+  const response = await api.put('/auth/me', data);
+  return response.data.data;
+};
+
+export const getStats = async () => {
+  const response = await api.get('/auth/stats');
+  return response.data.data;
+};
+
 export const getTracks = async () => {
   const response = await api.get('/tracks');
   return response.data.data;

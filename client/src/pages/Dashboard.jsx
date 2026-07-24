@@ -1,12 +1,22 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Flame, Clock, Target, Code2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getStats } from '../lib/api';
+import { useContext } from 'react';
+import AuthContext from '../contexts/AuthContext';
 
 export default function Dashboard() {
+  const { user } = useContext(AuthContext);
+  
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['stats'],
+    queryFn: getStats
+  });
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline mb-2">Welcome back, Developer! 👋</h1>
+        <h1 className="text-3xl font-bold font-headline mb-2">Welcome back, {user?.name?.split(' ')[0] || 'Developer'}! 👋</h1>
         <p className="text-muted-foreground text-lg">Here's your progress and recommended tracks.</p>
       </div>
 
@@ -17,8 +27,8 @@ export default function Dashboard() {
               <Flame className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-2xl font-bold">3 Days</p>
-              <p className="text-sm text-muted-foreground">Current Streak</p>
+              <p className="text-2xl font-bold">{isLoading ? '-' : stats?.streak}</p>
+              <p className="text-sm text-muted-foreground">Current Streak (Days)</p>
             </div>
           </CardContent>
         </Card>
@@ -29,8 +39,8 @@ export default function Dashboard() {
               <Clock className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-2xl font-bold">12h 45m</p>
-              <p className="text-sm text-muted-foreground">Learning Time</p>
+              <p className="text-2xl font-bold">{isLoading ? '-' : stats?.learningTime}</p>
+              <p className="text-sm text-muted-foreground">Learning Time (Hrs)</p>
             </div>
           </CardContent>
         </Card>
@@ -41,8 +51,8 @@ export default function Dashboard() {
               <Target className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-2xl font-bold">78%</p>
-              <p className="text-sm text-muted-foreground">Frontend Readiness</p>
+              <p className="text-2xl font-bold">{isLoading ? '-' : stats?.readiness}%</p>
+              <p className="text-sm text-muted-foreground">Interview Readiness</p>
             </div>
           </CardContent>
         </Card>
@@ -53,8 +63,8 @@ export default function Dashboard() {
               <Code2 className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-2xl font-bold">42</p>
-              <p className="text-sm text-muted-foreground">Problems Solved</p>
+              <p className="text-2xl font-bold">{isLoading ? '-' : stats?.problemsSolved}</p>
+              <p className="text-sm text-muted-foreground">Topics Bookmarked</p>
             </div>
           </CardContent>
         </Card>

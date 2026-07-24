@@ -19,9 +19,20 @@ const toggleBookmark = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   if (!userId) throw new Error('Not authenticated');
 
-  const { itemType, itemId, title, link } = req.body;
+  const { itemType, itemId, slug, title, link } = req.body;
+  
+  let targetId = itemId;
 
-  const existing = await Bookmark.findOne({ user: userId, itemId });
+  if (!targetId && slug && itemType === 'topic') {
+    const Topic = require('../models/Topic.model');
+    const topic = await Topic.findOne({ slug });
+    if (!topic) throw new Error('Topic not found');
+    targetId = topic._id;
+  }
+
+  if (!targetId) throw new Error('itemId or slug is required');
+
+  const existing = await Bookmark.findOne({ user: userId, itemId: targetId });
   if (existing) {
     await Bookmark.deleteOne({ _id: existing._id });
     return res.status(200).json(new ApiResponse(200, { isBookmarked: false }, 'Bookmark removed'));
@@ -30,7 +41,7 @@ const toggleBookmark = asyncHandler(async (req, res) => {
   const newBookmark = await Bookmark.create({
     user: userId,
     itemType,
-    itemId,
+    itemId: targetId,
     notes: JSON.stringify({ title, link }) // Storing metadata in notes for simple UI access
   });
 

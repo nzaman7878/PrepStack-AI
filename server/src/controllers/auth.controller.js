@@ -119,10 +119,42 @@ const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, { user: user.toJSON() }, 'User fetched successfully'));
 });
 
+const updateProfile = asyncHandler(async (req, res) => {
+  const { name } = req.body;
+  if (!name) {
+    throw new ApiError(400, 'Name is required');
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    { name },
+    { new: true, runValidators: true }
+  );
+
+  res.status(200).json(new ApiResponse(200, { user: user.toJSON() }, 'Profile updated successfully'));
+});
+
+const getStats = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const Bookmark = require('../models/Bookmark.model');
+  const bookmarkCount = await Bookmark.countDocuments({ user: req.user._id });
+
+  const stats = {
+    streak: user.streak?.current || 0,
+    learningTime: Math.floor(Math.random() * 20) + 5, // Mock learning time for now
+    problemsSolved: bookmarkCount, // Just a simple derived metric for now
+    readiness: Math.floor(Math.random() * 40) + 60 // Mock readiness percentage
+  };
+
+  res.status(200).json(new ApiResponse(200, stats, 'User stats retrieved'));
+});
+
 module.exports = {
   register,
   login,
   logout,
   refresh,
-  getMe
+  getMe,
+  updateProfile,
+  getStats
 };
