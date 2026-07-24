@@ -12,10 +12,10 @@ export default function Layout() {
             <div className="h-6 w-6 rounded bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-xs">PS</span>
             </div>
-            <span className="font-headline font-bold">PrepStack AI ⭐⭐⭐⭐⭐</span>
+            <span className="font-headline font-bold">PrepStack AI </span>
           </div>
         </div>
-        
+
         <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
           <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-md bg-secondary text-secondary-foreground font-medium">
             <Home className="h-4 w-4" />
@@ -62,13 +62,13 @@ export default function Layout() {
             </Button>
             <span className="md:hidden font-headline font-bold text-lg">PrepStack AI</span>
           </div>
-          
+
           <div className="flex-1 flex justify-end md:justify-start md:ml-4 max-w-md hidden md:flex relative">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Search topics, questions, cheat sheets... (Cmd+K)" 
+              <input
+                type="text"
+                placeholder="Search topics, questions, cheat sheets... (Cmd+K)"
                 className="w-full h-10 bg-secondary/50 border border-transparent rounded-lg pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
