@@ -4,17 +4,34 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { registerUser } from '../../lib/api';
+import AuthContext from '../../contexts/AuthContext';
+import { useContext } from 'react';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // Simulate registration for now
-    navigate('/dashboard');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const data = await registerUser({ name, email, password });
+      localStorage.setItem('token', data.token);
+      setUser(data.data.user);
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to register');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -28,6 +45,7 @@ export default function Register() {
           <CardDescription>Enter your details below to create your account</CardDescription>
         </CardHeader>
         <CardContent>
+          {error && <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600">{error}</div>}
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
@@ -61,7 +79,9 @@ export default function Register() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <Button type="submit" className="w-full">Sign Up</Button>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Creating account...' : 'Sign Up'}
+            </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">

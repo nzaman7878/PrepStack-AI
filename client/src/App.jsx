@@ -13,36 +13,42 @@ import Bookmarks from './pages/Bookmarks';
 import Practice from './pages/Practice';
 import Interview from './pages/Interview';
 import Admin from './pages/Admin';
-import AuthContext from './contexts/AuthContext';
-import { useState } from 'react';
+import Settings from './pages/Settings';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
 const queryClient = new QueryClient();
 
 function App() {
-  const [user, setUser] = useState(null);
-
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ user, setUser }}>
+      <AuthProvider>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route element={<Layout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/roadmap" element={<Roadmap />} />
-              <Route path="/bookmarks" element={<Bookmarks />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/tracks" element={<Tracks />} />
-              <Route path="/tracks/:trackSlug" element={<TrackDetails />} />
-              <Route path="/tracks/:trackSlug/interview" element={<Interview />} />
-              <Route path="/tracks/:trackSlug/:topicSlug" element={<TopicDetails />} />
-              <Route path="/tracks/:trackSlug/:topicSlug/practice" element={<Practice />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<Layout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/bookmarks" element={<Bookmarks />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/tracks" element={<Tracks />} />
+                <Route path="/tracks/:trackSlug" element={<TrackDetails />} />
+                <Route path="/tracks/:trackSlug/interview" element={<Interview />} />
+                <Route path="/tracks/:trackSlug/:topicSlug" element={<TopicDetails />} />
+                <Route path="/tracks/:trackSlug/:topicSlug/practice" element={<Practice />} />
+                
+                <Route element={<AdminRoute />}>
+                  <Route path="/admin" element={<Admin />} />
+                </Route>
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>
-      </AuthContext.Provider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

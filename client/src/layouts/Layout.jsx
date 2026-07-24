@@ -1,8 +1,11 @@
 import { Outlet, Link } from 'react-router';
 import { Home, Compass, Bookmark, Settings, LogOut, Menu, Map, Search, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useContext } from 'react';
+import AuthContext from '../contexts/AuthContext';
 
 export default function Layout() {
+  const { user, logout } = useContext(AuthContext);
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
@@ -37,16 +40,27 @@ export default function Layout() {
             <Settings className="h-4 w-4" />
             Settings
           </Link>
-          <div className="pt-4 mt-2 border-t border-slate-200">
-            <Link to="/admin" className="flex items-center gap-3 px-3 py-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-medium transition-colors">
-              <Shield className="h-4 w-4" />
-              Admin
-            </Link>
-          </div>
+          {user?.role === 'admin' && (
+            <div className="pt-4 mt-2 border-t border-slate-200">
+              <Link to="/admin" className="flex items-center gap-3 px-3 py-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-medium transition-colors">
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            </div>
+          )}
         </nav>
 
         <div className="p-4 border-t">
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground">
+          <div className="flex items-center gap-3 px-3 py-2 mb-4">
+            <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm uppercase">
+              {user?.name?.charAt(0) || 'U'}
+            </div>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-sm font-medium text-slate-900 truncate">{user?.name}</span>
+              <span className="text-xs text-slate-500 truncate">{user?.email}</span>
+            </div>
+          </div>
+          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-red-600 hover:bg-red-50 transition-colors" onClick={logout}>
             <LogOut className="mr-2 h-4 w-4" />
             Log out
           </Button>

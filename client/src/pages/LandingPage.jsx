@@ -4,9 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Brain, Code, Target } from 'lucide-react';
 
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { useContext } from 'react';
+import AuthContext from '../contexts/AuthContext';
 
 export default function LandingPage() {
   useDocumentTitle('The Ultimate Full Stack Interview Prep');
+  const { user, isLoading } = useContext(AuthContext);
   
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -25,12 +28,20 @@ export default function LandingPage() {
             <Link to="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">Pricing</Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Link to="/login">
-              <Button variant="ghost">Sign In</Button>
-            </Link>
-            <Link to="/register">
-              <Button>Get Started</Button>
-            </Link>
+            {!isLoading && user ? (
+              <Link to="/dashboard">
+                <Button>Go to Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link to="/register">
+                  <Button>Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>

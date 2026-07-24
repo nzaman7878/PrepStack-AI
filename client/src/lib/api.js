@@ -2,8 +2,51 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
-  withCredentials: true, // Need this for cookies (refresh tokens) if implemented later
+  withCredentials: true,
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Ignore if the request was to login/register or getMe initially
+      const isAuthRoute = error.config.url.includes('/auth/login') || error.config.url.includes('/auth/register');
+      if (!isAuthRoute) {
+        localStorage.removeItem('token');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const loginUser = async (credentials) => {
+  const response = await api.post('/auth/login', credentials);
+  return response.data;
+};
+
+export const registerUser = async (data) => {
+  const response = await api.post('/auth/register', data);
+  return response.data;
+};
+
+export const logoutUser = async () => {
+  const token = localStorage.getItem('token');
+  const response = await api.post('/auth/logout', {}, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data;
+};
+
+export const getMe = async () => {
+  const token = localStorage.getItem('token');
+  const response = await api.get('/auth/me', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  return response.data.data;
+};
 
 export const getTracks = async () => {
   const response = await api.get('/tracks');
