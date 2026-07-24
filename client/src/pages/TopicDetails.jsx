@@ -56,14 +56,24 @@ export default function TopicDetails() {
     queryFn: getBookmarks,
   });
 
-  const isBookmarked = bookmarkedTopics?.some(t => t.slug === topicSlug);
+  const isBookmarked = bookmarkedTopics?.some(b => {
+    try {
+      if (b.notes) {
+        const notes = JSON.parse(b.notes);
+        return notes.link === `/tracks/${trackSlug}/${topicSlug}`;
+      }
+    } catch (e) {
+      return false;
+    }
+    return false;
+  });
 
   useDocumentTitle(data ? `${data.name}` : 'Topic Details');
 
   const bookmarkMutation = useMutation({
     mutationFn: toggleBookmark,
     onSuccess: () => {
-      queryClient.invalidateQueries(['bookmarks']);
+      queryClient.invalidateQueries({ queryKey: ['bookmarks'] });
     },
   });
 
