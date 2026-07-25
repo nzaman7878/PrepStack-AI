@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getRoadmaps, generateAdminRoadmap, createRoadmap, deleteRoadmap } from '../../lib/api';
+import { getRoadmaps, generateAdminRoadmap, createRoadmap, deleteRoadmap, updateRoadmap } from '../../lib/api';
 import { Bot, Plus, Trash2, Edit, Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -59,6 +59,21 @@ export default function RoadmapManager() {
     }
     setIsGenerating(true);
     generateMutation.mutate();
+  };
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => updateRoadmap(id, data),
+    onSuccess: () => {
+      toast.success('Roadmap updated');
+      queryClient.invalidateQueries(['admin-roadmaps']);
+    },
+    onError: () => {
+      toast.error('Failed to update roadmap');
+    }
+  });
+
+  const togglePublish = (roadmap) => {
+    updateMutation.mutate({ id: roadmap._id, data: { isPublished: !roadmap.isPublished } });
   };
 
   if (isLoading) {
@@ -144,6 +159,13 @@ export default function RoadmapManager() {
                 </div>
                 
                 <div className="flex gap-2">
+                  <button 
+                    onClick={() => togglePublish(roadmap)}
+                    disabled={updateMutation.isPending}
+                    className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors border ${roadmap.isPublished ? 'border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100' : 'border-green-200 text-green-700 bg-green-50 hover:bg-green-100'}`}
+                  >
+                    {roadmap.isPublished ? 'Unpublish' : 'Publish'}
+                  </button>
                   <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Edit Roadmap (Coming Soon)">
                     <Edit className="w-5 h-5" />
                   </button>

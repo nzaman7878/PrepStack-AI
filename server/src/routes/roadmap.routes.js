@@ -7,13 +7,13 @@ const {
   updateRoadmap,
   deleteRoadmap
 } = require('../controllers/roadmap.controller');
-const { verifyJWT, authorizeRoles } = require('../middlewares/auth.middleware');
+const { verifyJWT, authorizeRoles, optionalVerifyJWT } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
-// Public / User routes
-router.route('/').get(getAllRoadmaps);
-router.route('/:slug').get(getRoadmapBySlug);
+// Public / User routes (with optional auth to detect admins)
+router.route('/').get(optionalVerifyJWT, getAllRoadmaps);
+router.route('/:slug').get(optionalVerifyJWT, getRoadmapBySlug);
 
 // User progress route
 router.route('/:roadmapId/progress/:topicSlug').post(verifyJWT, updateRoadmapProgress);

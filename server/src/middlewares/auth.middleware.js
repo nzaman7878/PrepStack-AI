@@ -35,4 +35,20 @@ const authorizeRoles = (...roles) => {
   };
 };
 
-module.exports = { verifyJWT, authorizeRoles };
+const optionalVerifyJWT = asyncHandler(async (req, res, next) => {
+  try {
+    const token = req.cookies?.accessToken || req.header('Authorization')?.replace('Bearer ', '');
+    if (token) {
+      const decodedToken = jwt.verify(token, env.jwtSecret);
+      const user = await User.findById(decodedToken._id).select('-password');
+      if (user) {
+        req.user = user;
+      }
+    }
+    next();
+  } catch (error) {
+    next();
+  }
+});
+
+module.exports = { verifyJWT, authorizeRoles, optionalVerifyJWT };
