@@ -1,11 +1,16 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { getRoadmap } from '../lib/api';
-import { CheckCircle2, Circle, Clock, ArrowLeft, ExternalLink, PlayCircle, BookOpen } from 'lucide-react';
+import { ArrowLeft, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { motion } from 'framer-motion';
+import RoadmapNode from '../components/roadmap/RoadmapNode';
+import TopicDetailPanel from '../components/roadmap/TopicDetailPanel';
 
 export default function RoadmapDetails() {
   const { roadmapSlug } = useParams();
+  const [selectedTopic, setSelectedTopic] = useState(null);
 
   const { data: roadmapData, isLoading } = useQuery({
     queryKey: ['roadmap', roadmapSlug],
@@ -14,15 +19,15 @@ export default function RoadmapDetails() {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
       </div>
     );
   }
 
   if (!roadmapData?.roadmap) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 h-screen flex flex-col items-center justify-center">
         <h2 className="text-2xl font-bold text-slate-900">Roadmap not found</h2>
         <Link to="/roadmap" className="text-indigo-600 hover:underline mt-4 inline-block">Back to Roadmaps</Link>
       </div>
@@ -31,117 +36,135 @@ export default function RoadmapDetails() {
 
   const { roadmap, progressMap } = roadmapData;
 
-  const getResourceIcon = (type) => {
-    switch(type) {
-      case 'video': return <PlayCircle className="w-4 h-4" />;
-      case 'article': 
-      case 'documentation': return <BookOpen className="w-4 h-4" />;
-      default: return <ExternalLink className="w-4 h-4" />;
-    }
+  const handleTopicClick = (topic) => {
+    setSelectedTopic(topic);
+  };
+
+  const getTopicStatus = (topic) => {
+    if (progressMap?.[topic.slug] === 'completed') return 'completed';
+    if (progressMap?.[topic.slug] === 'in-progress') return 'in-progress';
+    return 'not-started';
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <Link to="/roadmap" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Roadmaps
-        </Link>
-      </div>
-      
-      <div className="mb-12">
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl mb-4">
-          {roadmap.title}
-        </h1>
-        <p className="text-xl text-slate-600 max-w-3xl">
-          {roadmap.description}
-        </p>
+    <div className="relative h-screen w-full bg-slate-50 overflow-hidden flex flex-col">
+      {/* Top Navigation Bar */}
+      <div className="absolute top-0 left-0 right-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
+        <div className="flex items-center gap-6">
+          <Link to="/roadmap" className="p-2 rounded-full hover:bg-slate-100 transition-colors">
+            <ArrowLeft className="w-5 h-5 text-slate-600" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">{roadmap.title}</h1>
+            <p className="text-xs font-medium text-slate-500">{roadmap.role}</p>
+          </div>
+        </div>
       </div>
 
-      <div className="relative border-l-4 border-slate-200 ml-4 md:ml-8 space-y-16 pb-12">
-        {roadmap.phases?.map((phase, phaseIdx) => (
-          <div key={phase._id} className="relative pl-8 md:pl-12">
-            <div className="absolute -left-[14px] top-1 flex h-6 w-6 items-center justify-center rounded-full border-4 border-white bg-indigo-500"></div>
-            
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Phase {phaseIdx + 1}: {phase.name}</h2>
-            <p className="text-slate-600 mb-8 max-w-3xl">{phase.description}</p>
-            
-            <div className="space-y-10">
-              {phase.milestones?.map((milestone, msIdx) => (
-                <div key={milestone._id} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{milestone.title}</h3>
-                  <p className="text-slate-600 mb-6">{milestone.description}</p>
+      {/* Interactive Canvas */}
+      <div className="flex-1 w-full h-full pt-20">
+        <TransformWrapper
+          initialScale={1}
+          minScale={0.3}
+          maxScale={2}
+          centerOnInit={true}
+          limitToBounds={false}
+        >
+          {({ zoomIn, zoomOut, resetTransform }) => (
+            <>
+              {/* Floating Controls */}
+              <div className="absolute bottom-8 left-8 z-30 flex flex-col gap-2 bg-white p-2 rounded-xl shadow-lg border border-slate-200">
+                <button onClick={() => zoomIn()} className="p-2 hover:bg-slate-100 rounded-lg transition-colors" title="Zoom In">
+                  <ZoomIn className="w-5 h-5 text-slate-700" />
+                </button>
+                <div className="w-full h-px bg-slate-200 my-1" />
+                <button onClick={() => zoomOut()} className="p-2 hover:bg-slate-100 rounded-lg transition-colors" title="Zoom Out">
+                  <ZoomOut className="w-5 h-5 text-slate-700" />
+                </button>
+                <div className="w-full h-px bg-slate-200 my-1" />
+                <button onClick={() => resetTransform()} className="p-2 hover:bg-slate-100 rounded-lg transition-colors" title="Reset View">
+                  <Maximize className="w-5 h-5 text-slate-700" />
+                </button>
+              </div>
+
+              <TransformComponent wrapperClass="w-full h-full cursor-grab active:cursor-grabbing !bg-slate-50">
+                <div className="relative min-w-max p-32 flex flex-col items-center">
                   
-                  <div className="space-y-4">
-                    {milestone.topics?.map(topic => {
-                      const isCompleted = progressMap?.[topic.slug] === 'completed';
-                      
-                      return (
-                        <div key={topic._id} className={`rounded-xl border ${isCompleted ? 'border-green-200 bg-green-50' : 'border-slate-100 bg-slate-50'} p-5 transition-colors hover:border-indigo-300 hover:bg-indigo-50/50`}>
-                          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                            <div className="flex items-start flex-1">
-                              {isCompleted ? (
-                                <CheckCircle2 className="mr-3 h-6 w-6 text-green-500 mt-0.5 flex-shrink-0" />
-                              ) : (
-                                <Circle className="mr-3 h-6 w-6 text-slate-300 mt-0.5 flex-shrink-0" />
-                              )}
+                  {/* The Central Spine */}
+                  <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-1.5 bg-slate-200 rounded-full" />
+
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      visible: { transition: { staggerChildren: 0.1 } }
+                    }}
+                    className="flex flex-col items-center gap-y-24 w-full"
+                  >
+                    {roadmap.phases?.map((phase, pIdx) => (
+                      <div key={phase._id} className="relative flex flex-col items-center w-full">
+                        
+                        {/* Phase Header */}
+                        <div className="relative z-10 bg-indigo-600 text-white px-8 py-3 rounded-full shadow-lg shadow-indigo-600/30 border-4 border-white mb-16">
+                          <h2 className="text-xl font-black uppercase tracking-widest">Phase {pIdx + 1}: {phase.name}</h2>
+                        </div>
+
+                        {/* Milestones inside Phase */}
+                        <div className="flex flex-col items-center gap-y-32 w-full">
+                          {phase.milestones?.map((milestone, mIdx) => (
+                            <div key={milestone._id} className="relative w-full flex flex-col items-center">
                               
-                              <div>
-                                <h4 className="text-lg font-bold text-slate-900 flex items-center gap-3">
-                                  {topic.name}
-                                  {topic.estimatedTime && (
-                                    <span className="inline-flex items-center text-xs font-medium text-slate-500 bg-white px-2 py-1 rounded border border-slate-200">
-                                      <Clock className="w-3 h-3 mr-1" />
-                                      {topic.estimatedTime}
-                                    </span>
-                                  )}
-                                </h4>
-                                <p className="mt-1 text-slate-600 text-sm leading-relaxed">{topic.description}</p>
-                                
-                                {topic.resources?.length > 0 && (
-                                  <div className="mt-4 flex flex-wrap gap-2">
-                                    {topic.resources.map((res, rIdx) => (
-                                      <a 
-                                        key={rIdx} 
-                                        href={res.url} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-full hover:border-indigo-300 hover:text-indigo-600 transition-colors"
-                                      >
-                                        {getResourceIcon(res.type)}
-                                        {res.title}
-                                      </a>
-                                    ))}
-                                  </div>
-                                )}
+                              {/* Milestone Node on spine */}
+                              <div className="relative z-10 w-6 h-6 rounded-full bg-white border-4 border-indigo-500 shadow-md flex items-center justify-center mb-8">
+                                <div className="w-2 h-2 bg-indigo-500 rounded-full" />
+                              </div>
+                              
+                              {/* Milestone Label */}
+                              <div className="absolute top-0 left-1/2 ml-6 bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 max-w-[200px] z-10">
+                                <h3 className="text-sm font-bold text-slate-800">{milestone.title}</h3>
+                              </div>
+
+                              {/* Topics Grid/Tree */}
+                              <div className="relative w-full flex flex-col items-center gap-y-12 mt-8">
+                                {milestone.topics?.map((topic, tIdx) => {
+                                  const isLeft = tIdx % 2 === 0;
+                                  
+                                  return (
+                                    <div key={topic._id} className={`w-full flex ${isLeft ? 'justify-end pr-[50%] mr-12' : 'justify-start pl-[50%] ml-12'} relative`}>
+                                      <RoadmapNode
+                                        topic={topic}
+                                        status={getTopicStatus(topic)}
+                                        onClick={handleTopicClick}
+                                        isLeft={isLeft}
+                                      />
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
-                            
-                            <div className="md:w-auto w-full md:pl-4 md:border-l md:border-slate-200 flex md:flex-col items-center md:items-end justify-between md:justify-center">
-                              {topic.topicRef && topic.topicRef.track ? (
-                                <Link 
-                                  to={`/tracks/${topic.topicRef.track.slug}/${topic.topicRef.slug}`}
-                                  className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 w-full text-center"
-                                >
-                                  Take Quiz / Practice
-                                </Link>
-                              ) : (
-                                <span className="text-xs text-slate-400 bg-white px-3 py-1 rounded-full border border-slate-200">
-                                  Theory Only
-                                </span>
-                              )}
-                            </div>
-                          </div>
+                          ))}
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
+                  </motion.div>
+                  
+                  {/* End of Roadmap Node */}
+                  <div className="relative z-10 bg-green-500 text-white p-4 rounded-full shadow-lg shadow-green-500/30 border-4 border-white mt-16 flex items-center justify-center">
+                    <span className="font-bold uppercase tracking-wider">Completion</span>
                   </div>
+
                 </div>
-              ))}
-            </div>
-          </div>
-        ))}
+              </TransformComponent>
+            </>
+          )}
+        </TransformWrapper>
       </div>
+
+      <TopicDetailPanel 
+        topic={selectedTopic} 
+        isOpen={!!selectedTopic} 
+        onClose={() => setSelectedTopic(null)} 
+      />
     </div>
   );
 }
