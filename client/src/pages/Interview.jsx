@@ -69,6 +69,16 @@ export default function Interview() {
           text: result.data.questionData.question 
         }
       ]);
+    } else if (result.error) {
+      const isNotFound = result.error?.response?.status === 404;
+      setMessages([
+        { 
+          id: Date.now(), 
+          sender: 'ai', 
+          type: 'error', 
+          text: isNotFound ? 'Mock interview questions are not available yet. Please check back later.' : 'Failed to load question.' 
+        }
+      ]);
     }
   };
 
@@ -84,6 +94,17 @@ export default function Interview() {
           sender: 'ai', 
           type: 'question', 
           text: result.data.questionData.question 
+        }
+      ]);
+    } else if (result.error) {
+      const isNotFound = result.error?.response?.status === 404;
+      setMessages(prev => [
+        ...prev,
+        { 
+          id: Date.now(), 
+          sender: 'ai', 
+          type: 'error', 
+          text: isNotFound ? 'No more mock interview questions available at this time.' : 'Failed to load question.' 
         }
       ]);
     }

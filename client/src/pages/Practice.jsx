@@ -24,22 +24,34 @@ export default function Practice() {
           <div className="absolute h-full w-full animate-ping rounded-full border-4 border-blue-400 opacity-20"></div>
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
         </div>
-        <p className="mt-4 text-slate-500 font-medium animate-pulse">Generating AI Practice Quiz...</p>
+        <p className="mt-4 text-slate-500 font-medium">Loading practice quiz...</p>
       </div>
     );
   }
 
   if (error || !quiz || !quiz.questions) {
+    const isNotFound = error?.response?.status === 404;
     return (
-      <div className="mx-auto mt-12 max-w-4xl rounded-xl bg-red-50 p-6 text-red-600 border border-red-200">
+      <div className="mx-auto mt-12 max-w-4xl rounded-xl bg-slate-50 p-6 text-slate-600 border border-slate-200">
         <div className="flex items-start gap-4">
-          <AlertCircle className="h-6 w-6 flex-shrink-0" />
+          <AlertCircle className={`h-6 w-6 flex-shrink-0 ${isNotFound ? 'text-slate-400' : 'text-red-500'}`} />
           <div>
-            <h3 className="font-bold text-lg">Failed to generate quiz</h3>
-            <p className="mt-1">{error?.message || 'An unknown error occurred.'}</p>
-            <button onClick={() => refetch()} className="mt-4 inline-flex items-center text-sm font-semibold text-red-700 hover:text-red-800">
-              <RefreshCw className="mr-2 h-4 w-4" /> Try Again
-            </button>
+            <h3 className={`font-bold text-lg ${isNotFound ? 'text-slate-700' : 'text-red-600'}`}>
+              {isNotFound ? 'Practice Quiz Not Available' : 'Failed to load quiz'}
+            </h3>
+            <p className="mt-1">
+              {isNotFound 
+                ? 'This practice quiz is currently being prepared and will be published soon. Please check back later.' 
+                : (error?.message || 'An unknown error occurred.')}
+            </p>
+            {!isNotFound && (
+              <button onClick={() => refetch()} className="mt-4 inline-flex items-center text-sm font-semibold text-red-700 hover:text-red-800">
+                <RefreshCw className="mr-2 h-4 w-4" /> Try Again
+              </button>
+            )}
+            <Link to={`/tracks/${trackSlug}/${topicSlug}`} className="mt-4 block text-sm text-blue-600 hover:underline">
+              &larr; Back to topic
+            </Link>
           </div>
         </div>
       </div>

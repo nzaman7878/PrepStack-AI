@@ -170,4 +170,19 @@ export const updateContent = async (id, data) => {
   return response.data.data;
 };
 
+export const generateAdminTopicContent = async (topicSlug, difficulty = 'intermediate') => {
+  const response = await api.post(`/admin/generate/topic/${topicSlug}/overview`, { difficulty });
+  return response.data.data;
+};
+
+export const generateAdminPracticeQuiz = async (topicSlug, difficulty = 'intermediate') => {
+  const response = await api.post(`/admin/generate/topic/${topicSlug}/practice`, { difficulty });
+  return response.data.data;
+};
+
+export const generateAdminInterviewQuestion = async (trackSlug, difficulty = 'intermediate') => {
+  const response = await api.post(`/admin/generate/track/${trackSlug}/interview`, { difficulty });
+  return response.data.data;
+};
+
 export default api;

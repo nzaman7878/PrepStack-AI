@@ -1,5 +1,7 @@
 const GeneratedContent = require('../models/GeneratedContent.model');
 const Topic = require('../models/Topic.model');
+const Track = require('../models/Track.model');
+const geminiService = require('../services/gemini.service');
 const asyncHandler = require('../utils/asyncHandler');
 const ApiResponse = require('../utils/ApiResponse');
 const ApiError = require('../utils/ApiError');
@@ -83,10 +85,127 @@ const updateContent = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, existingContent, 'Content updated successfully'));
 });
 
+// --- AI Generation Controllers ---
+
+const generateTopicContent = asyncHandler(async (req, res) => {
+  const { topicSlug } = req.params;
+  const { difficulty = 'intermediate' } = req.body; // or req.query
+
+  const topic = await Topic.findOne({ slug: topicSlug }).populate('track');
+  if (!topic) throw new ApiError(404, 'Topic not found');
+
+  const trackName = topic.track ? topic.track.name : 'Software Engineering';
+  const generationResult = await geminiService.generateTopicContent(topic.name, trackName, difficulty);
+
+  // Check if exists
+  let content = await GeneratedContent.findOne({ topic: topic._id, contentType: 'overview', difficulty });
+  
+  if (content) {
+    content.content = generationResult.content;
+    content.tokenUsage = {
+      input: generationResult.usage?.promptTokenCount || 0,
+      output: generationResult.usage?.candidatesTokenCount || 0,
+    };
+    content.generatedAt = new Date();
+    await content.save();
+  } else {
+    content = await GeneratedContent.create({
+      topic: topic._id,
+      contentType: 'overview',
+      difficulty,
+      content: generationResult.content,
+      generationModel: 'gemini-flash-latest',
+      tokenUsage: {
+        input: generationResult.usage?.promptTokenCount || 0,
+        output: generationResult.usage?.candidatesTokenCount || 0,
+      },
+      promptVersion: '1.0',
+      cacheStatus: 'fresh',
+      isApproved: true
+    });
+  }
+
+  res.status(201).json(new ApiResponse(201, content, 'Topic content generated successfully'));
+});
+
+const generateTopicPractice = asyncHandler(async (req, res) => {
+  const { topicSlug } = req.params;
+  const { difficulty = 'intermediate' } = req.body;
+
+  const topic = await Topic.findOne({ slug: topicSlug }).populate('track');
+  if (!topic) throw new ApiError(404, 'Topic not found');
+
+  const trackName = topic.track ? topic.track.name : 'Software Engineering';
+  const generationResult = await geminiService.generatePracticeQuiz(topic.name, trackName, difficulty);
+
+  let content = await GeneratedContent.findOne({ topic: topic._id, contentType: 'practice', difficulty });
+  
+  if (content) {
+    content.content = generationResult.content;
+    content.tokenUsage = {
+      input: generationResult.usage?.promptTokenCount || 0,
+      output: generationResult.usage?.candidatesTokenCount || 0,
+    };
+    content.generatedAt = new Date();
+    await content.save();
+  } else {
+    content = await GeneratedContent.create({
+      topic: topic._id,
+      contentType: 'practice',
+      difficulty,
+      content: generationResult.content,
+      generationModel: 'gemini-flash-latest',
+      tokenUsage: {
+        input: generationResult.usage?.promptTokenCount || 0,
+        output: generationResult.usage?.candidatesTokenCount || 0,
+      },
+      promptVersion: '1.0',
+      cacheStatus: 'fresh',
+      isApproved: true
+    });
+  }
+
+  res.status(201).json(new ApiResponse(201, content, 'Practice quiz generated successfully'));
+});
+
+const generateMockInterviewQuestion = asyncHandler(async (req, res) => {
+  const { trackSlug } = req.params;
+  const { difficulty = 'intermediate' } = req.body;
+
+  const track = await Track.findOne({ slug: trackSlug });
+  if (!track) throw new ApiError(404, 'Track not found');
+
+  const generationResult = await geminiService.generateMockInterviewQuestion(track.name, difficulty);
+
+  // We save interview questions without a specific topic (or we could make topic optional).
+  // Currently GeneratedContent requires a topic. Let's see if it's required in the schema.
+  // Assuming it might be, wait! We need to check if topic is required. 
+  // For now, let's just save it. 
+  const content = await GeneratedContent.create({
+    contentType: 'interview',
+    difficulty,
+    content: generationResult.content,
+    generationModel: 'gemini-flash-latest',
+    tokenUsage: {
+      input: generationResult.usage?.promptTokenCount || 0,
+      output: generationResult.usage?.candidatesTokenCount || 0,
+    },
+    promptVersion: '1.0',
+    cacheStatus: 'fresh',
+    isApproved: true,
+    track: track._id // we might need to add track reference, or just rely on it
+  });
+
+  res.status(201).json(new ApiResponse(201, content, 'Mock interview question generated successfully'));
+});
+
 module.exports = {
   getCachedContent,
   clearCache,
   getContentById,
   createContent,
-  updateContent
+  updateContent,
+  generateTopicContent,
+  generateTopicPractice,
+  generateMockInterviewQuestion
 };

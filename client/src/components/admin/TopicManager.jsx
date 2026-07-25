@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAllTopics, getTracks, createTopic, updateTopic, deleteTopic } from '../../lib/api';
-import { Edit2, Trash2, Plus, X } from 'lucide-react';
+import { getAllTopics, getTracks, createTopic, updateTopic, deleteTopic, generateAdminTopicContent, generateAdminPracticeQuiz } from '../../lib/api';
+import { Edit2, Trash2, Plus, X, BookOpen, Bot } from 'lucide-react';
 
 export default function TopicManager() {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState(null);
+  const [generatingTopicId, setGeneratingTopicId] = useState(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -107,6 +108,32 @@ export default function TopicManager() {
     }
   };
 
+  const generateOverviewMutation = useMutation({
+    mutationFn: (slug) => generateAdminTopicContent(slug),
+    onMutate: (slug) => setGeneratingTopicId(slug + '_overview'),
+    onSuccess: () => {
+      alert('Topic overview generated successfully!');
+      setGeneratingTopicId(null);
+    },
+    onError: (error) => {
+      alert(`Failed to generate overview: ${error.message}`);
+      setGeneratingTopicId(null);
+    }
+  });
+
+  const generatePracticeMutation = useMutation({
+    mutationFn: (slug) => generateAdminPracticeQuiz(slug),
+    onMutate: (slug) => setGeneratingTopicId(slug + '_practice'),
+    onSuccess: () => {
+      alert('Practice quiz generated successfully!');
+      setGeneratingTopicId(null);
+    },
+    onError: (error) => {
+      alert(`Failed to generate practice quiz: ${error.message}`);
+      setGeneratingTopicId(null);
+    }
+  });
+
   if (isLoadingTopics || isLoadingTracks) {
     return <div className="p-8 text-center text-slate-500">Loading topics...</div>;
   }
@@ -155,14 +182,32 @@ export default function TopicManager() {
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                  <button
+                    onClick={() => generateOverviewMutation.mutate(topic.slug)}
+                    disabled={generatingTopicId === topic.slug + '_overview'}
+                    title="Generate Overview"
+                    className="text-blue-600 hover:text-blue-900 mr-3 disabled:opacity-50"
+                  >
+                    <BookOpen className={`w-4 h-4 ${generatingTopicId === topic.slug + '_overview' ? 'animate-pulse' : ''}`} />
+                  </button>
+                  <button
+                    onClick={() => generatePracticeMutation.mutate(topic.slug)}
+                    disabled={generatingTopicId === topic.slug + '_practice'}
+                    title="Generate Practice Quiz"
+                    className="text-green-600 hover:text-green-900 mr-4 disabled:opacity-50"
+                  >
+                    <Bot className={`w-4 h-4 ${generatingTopicId === topic.slug + '_practice' ? 'animate-pulse' : ''}`} />
+                  </button>
                   <button 
                     onClick={() => openModal(topic)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    title="Edit Topic"
+                    className="text-indigo-600 hover:text-indigo-900 mr-3"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={() => handleDelete(topic._id)}
+                    title="Delete Topic"
                     className="text-red-600 hover:text-red-900"
                   >
                     <Trash2 className="w-4 h-4" />

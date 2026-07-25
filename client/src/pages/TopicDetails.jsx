@@ -84,18 +84,28 @@ export default function TopicDetails() {
           <div className="absolute h-full w-full animate-ping rounded-full border-4 border-blue-400 opacity-20"></div>
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
         </div>
-        <p className="mt-4 text-slate-500 font-medium animate-pulse">Generating AI content for this topic...</p>
+        <p className="mt-4 text-slate-500 font-medium">Loading content...</p>
       </div>
     );
   }
 
   if (error || !data) {
+    const isNotFound = error?.response?.status === 404;
     return (
-      <div className="mx-auto mt-12 max-w-4xl rounded-xl bg-red-50 p-6 text-red-600 border border-red-200 shadow-sm flex items-start gap-4">
-        <AlertCircle className="h-6 w-6 flex-shrink-0" />
+      <div className="mx-auto mt-12 max-w-4xl rounded-xl bg-slate-50 p-6 text-slate-600 border border-slate-200 shadow-sm flex items-start gap-4">
+        <AlertCircle className={`h-6 w-6 flex-shrink-0 ${isNotFound ? 'text-slate-400' : 'text-red-500'}`} />
         <div>
-          <h3 className="font-bold text-lg">Failed to load content</h3>
-          <p className="mt-1">{error?.message || 'An unknown error occurred.'}</p>
+          <h3 className={`font-bold text-lg ${isNotFound ? 'text-slate-700' : 'text-red-600'}`}>
+            {isNotFound ? 'Content not available yet' : 'Failed to load content'}
+          </h3>
+          <p className="mt-1">
+            {isNotFound 
+              ? 'This topic is currently being prepared and will be published soon. Please check back later.' 
+              : (error?.response?.data?.message || error?.message || 'An unknown error occurred.')}
+          </p>
+          <Link to={`/tracks/${trackSlug}`} className="mt-4 inline-block text-sm text-blue-600 hover:underline">
+            &larr; Back to track
+          </Link>
         </div>
       </div>
     );

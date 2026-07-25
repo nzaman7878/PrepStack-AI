@@ -26,6 +26,7 @@ const generateTokens = async (userId) => {
 
     return { accessToken, refreshToken };
   } catch (error) {
+    console.error("Token generation error:", error);
     throw new Error('Error generating tokens');
   }
 };

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTracks, createTrack, updateTrack, deleteTrack } from '../../lib/api';
-import { Edit2, Trash2, Plus, X } from 'lucide-react';
+import { getTracks, createTrack, updateTrack, deleteTrack, generateAdminInterviewQuestion } from '../../lib/api';
+import { Edit2, Trash2, Plus, X, Bot } from 'lucide-react';
 
 export default function TrackManager() {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
+  const [generatingTrackId, setGeneratingTrackId] = useState(null);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -94,6 +95,19 @@ export default function TrackManager() {
     }
   };
 
+  const generateInterviewMutation = useMutation({
+    mutationFn: (slug) => generateAdminInterviewQuestion(slug),
+    onMutate: (slug) => setGeneratingTrackId(slug),
+    onSuccess: () => {
+      alert('Interview question generated successfully!');
+      setGeneratingTrackId(null);
+    },
+    onError: (error) => {
+      alert(`Failed to generate interview question: ${error.message}`);
+      setGeneratingTrackId(null);
+    }
+  });
+
   if (isLoading) {
     return <div className="p-8 text-center text-slate-500">Loading tracks...</div>;
   }
@@ -138,14 +152,24 @@ export default function TrackManager() {
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                  <button
+                    onClick={() => generateInterviewMutation.mutate(track.slug)}
+                    disabled={generatingTrackId === track.slug}
+                    title="Generate Interview Question"
+                    className="text-purple-600 hover:text-purple-900 mr-3 disabled:opacity-50"
+                  >
+                    <Bot className={`w-4 h-4 ${generatingTrackId === track.slug ? 'animate-pulse' : ''}`} />
+                  </button>
                   <button 
                     onClick={() => openModal(track)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    title="Edit Track"
+                    className="text-indigo-600 hover:text-indigo-900 mr-3"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={() => handleDelete(track._id)}
+                    title="Delete Track"
                     className="text-red-600 hover:text-red-900"
                   >
                     <Trash2 className="w-4 h-4" />

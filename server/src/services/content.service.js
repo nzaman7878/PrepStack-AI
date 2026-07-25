@@ -17,40 +17,17 @@ class ContentService {
       throw new ApiError(404, 'Topic not found');
     }
 
-    // Check cache
-    if (!forceRegenerate) {
-      const cachedContent = await GeneratedContent.findOne({
-        topic: topic._id,
-        contentType: 'overview',
-        difficulty,
-      }).sort({ generatedAt: -1 });
-
-      if (cachedContent && cachedContent.cacheStatus !== 'stale') {
-        return cachedContent.content;
-      }
-    }
-
-    // Generate new content
-    const trackName = topic.track ? topic.track.name : 'Software Engineering';
-    const generationResult = await geminiService.generateTopicContent(topic.name, trackName, difficulty);
-
-    // Save to DB (Cache)
-    const newContent = await GeneratedContent.create({
+    const cachedContent = await GeneratedContent.findOne({
       topic: topic._id,
       contentType: 'overview',
       difficulty,
-      content: generationResult.content,
-      generationModel: 'gemini-flash-latest',
-      tokenUsage: {
-        input: generationResult.usage?.promptTokenCount || 0,
-        output: generationResult.usage?.candidatesTokenCount || 0,
-      },
-      promptVersion: '1.0',
-      cacheStatus: 'fresh',
-      generatedAt: new Date()
-    });
+    }).sort({ generatedAt: -1 });
 
-    return newContent.content;
+    if (cachedContent && cachedContent.cacheStatus !== 'stale') {
+      return cachedContent.content;
+    }
+
+    throw new ApiError(404, 'Content not available yet. Please check back later.');
   }
 }
 

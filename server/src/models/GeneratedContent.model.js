@@ -4,7 +4,11 @@ const generatedContentSchema = new mongoose.Schema({
   topic: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Topic',
-    required: true,
+    index: true
+  },
+  track: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Track',
     index: true
   },
   contentType: {
@@ -56,6 +60,6 @@ const generatedContentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Compound index for fast lookup
-generatedContentSchema.index({ topic: 1, contentType: 1, difficulty: 1 }, { unique: true });
+generatedContentSchema.index({ topic: 1, track: 1, contentType: 1, difficulty: 1 }, { unique: false });
 
 module.exports = mongoose.model('GeneratedContent', generatedContentSchema);

@@ -1,4 +1,5 @@
 const Track = require('../models/Track.model');
+const GeneratedContent = require('../models/GeneratedContent.model');
 const geminiService = require('../services/gemini.service');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asyncHandler');
@@ -13,14 +14,24 @@ const getMockInterviewQuestion = asyncHandler(async (req, res) => {
     throw new ApiError(404, 'Track not found');
   }
 
-  // Generate question on the fly (no need to cache, it should be varied)
-  const generationResult = await geminiService.generateMockInterviewQuestion(track.name, difficulty);
+  // Fetch from DB (we can fetch a random one, or just the most recent for MVP)
+  const questions = await GeneratedContent.find({
+    track: track._id,
+    contentType: 'interview',
+    difficulty
+  });
 
-  // Return generated content along with usage
+  if (!questions || questions.length === 0) {
+    throw new ApiError(404, 'Mock interview questions not available yet. Please check back later.');
+  }
+
+  // Select a random question
+  const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+
   res.status(200).json(new ApiResponse(200, {
-    questionData: generationResult.content,
-    usage: generationResult.usage
-  }, 'Mock interview question generated successfully'));
+    questionData: randomQuestion.content,
+    usage: null // no longer generating on the fly
+  }, 'Mock interview question retrieved successfully'));
 });
 
 const evaluateMockInterviewAnswer = asyncHandler(async (req, res) => {
