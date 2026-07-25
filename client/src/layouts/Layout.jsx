@@ -20,9 +20,20 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
-          <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded-md bg-secondary text-secondary-foreground font-medium">
+          {user?.role === 'admin' && (
+            <Link to="/admin" className="flex items-center gap-3 px-3 py-2 rounded-md bg-secondary text-secondary-foreground font-medium">
+              <Shield className="h-4 w-4" />
+              Admin Dashboard
+            </Link>
+          )}
+          
+          <Link to="/dashboard" className={`flex items-center gap-3 px-3 py-2 rounded-md font-medium transition-colors ${
+            user?.role === 'admin' 
+              ? 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground' 
+              : 'bg-secondary text-secondary-foreground'
+          }`}>
             <Home className="h-4 w-4" />
-            Dashboard
+            User Dashboard
           </Link>
           <Link to="/tracks" className="flex items-center gap-3 px-3 py-2 rounded-md text-muted-foreground hover:bg-secondary/50 hover:text-foreground font-medium transition-colors">
             <Compass className="h-4 w-4" />
@@ -40,14 +51,6 @@ export default function Layout() {
             <Settings className="h-4 w-4" />
             Settings
           </Link>
-          {user?.role === 'admin' && (
-            <div className="pt-4 mt-2 border-t border-slate-200">
-              <Link to="/admin" className="flex items-center gap-3 px-3 py-2 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900 font-medium transition-colors">
-                <Shield className="h-4 w-4" />
-                Admin
-              </Link>
-            </div>
-          )}
         </nav>
 
         <div className="p-4 border-t">

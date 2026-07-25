@@ -26,7 +26,12 @@ export default function Register() {
       const data = await registerUser({ name, email, password });
       localStorage.setItem('token', data.data.accessToken);
       setUser(data.data.user);
-      navigate('/dashboard');
+      
+      if (data.data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to register');
     } finally {
