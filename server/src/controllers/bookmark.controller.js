@@ -26,8 +26,16 @@ const toggleBookmark = asyncHandler(async (req, res) => {
   if (!targetId && slug && itemType === 'topic') {
     const Topic = require('../models/Topic.model');
     const topic = await Topic.findOne({ slug });
-    if (!topic) throw new Error('Topic not found');
-    targetId = topic._id;
+    if (topic) {
+      targetId = topic._id;
+    } else {
+      // If the topic doesn't exist in the database (e.g. AI generated on the fly), 
+      // we can generate a consistent ObjectId based on the slug, or just use a dummy one.
+      // Let's create a deterministic ObjectId from the slug to keep it unique per topic.
+      const crypto = require('crypto');
+      const hash = crypto.createHash('md5').update(slug).digest('hex').slice(0, 24);
+      targetId = hash;
+    }
   }
 
   if (!targetId) throw new Error('itemId or slug is required');
