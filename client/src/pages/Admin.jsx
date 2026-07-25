@@ -3,6 +3,7 @@ import { Database, Layout, BookOpen, FileText } from 'lucide-react';
 import TrackManager from '../components/admin/TrackManager';
 import TopicManager from '../components/admin/TopicManager';
 import ContentManager from '../components/admin/ContentManager';
+import RoadmapManager from '../components/admin/RoadmapManager';
 
 export default function Admin() {
   const [activeTab, setActiveTab] = useState('tracks');
@@ -60,6 +61,19 @@ export default function Admin() {
               Content Management
             </div>
           </button>
+          <button
+            onClick={() => setActiveTab('roadmaps')}
+            className={`whitespace-nowrap border-b-2 py-4 px-1 text-sm font-medium ${
+              activeTab === 'roadmaps'
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Roadmaps
+            </div>
+          </button>
         </nav>
       </div>
 
@@ -67,6 +81,7 @@ export default function Admin() {
         {activeTab === 'tracks' && <TrackManager />}
         {activeTab === 'topics' && <TopicManager />}
         {activeTab === 'content' && <ContentManager />}
+        {activeTab === 'roadmaps' && <RoadmapManager />}
       </div>
     </div>
   );

@@ -44,6 +44,7 @@ const bookmarkRouter = require('./routes/bookmark.routes');
 const practiceRouter = require('./routes/practice.routes');
 const interviewRouter = require('./routes/interview.routes');
 const adminRouter = require('./routes/admin.routes');
+const roadmapRouter = require('./routes/roadmap.routes');
 
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/content', contentRouter);
@@ -53,6 +54,7 @@ app.use('/api/v1/bookmarks', bookmarkRouter);
 app.use('/api/v1/practice', practiceRouter);
 app.use('/api/v1/interview', interviewRouter);
 app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/roadmaps', roadmapRouter);
 
 // Global Error Handler
 app.use(errorHandler);

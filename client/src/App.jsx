@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router';
+import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Layout from './layouts/Layout';
 import LandingPage from './pages/LandingPage';
@@ -9,6 +10,7 @@ import Tracks from './pages/Tracks';
 import TrackDetails from './pages/TrackDetails';
 import TopicDetails from './pages/TopicDetails';
 import Roadmap from './pages/Roadmap';
+import RoadmapDetails from './pages/RoadmapDetails';
 import Bookmarks from './pages/Bookmarks';
 import Practice from './pages/Practice';
 import Interview from './pages/Interview';
@@ -25,6 +27,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <BrowserRouter>
+          <Toaster position="top-right" />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
@@ -33,6 +36,7 @@ function App() {
               <Route element={<Layout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/roadmaps/:roadmapSlug" element={<RoadmapDetails />} />
                 <Route path="/bookmarks" element={<Bookmarks />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/tracks" element={<Tracks />} />

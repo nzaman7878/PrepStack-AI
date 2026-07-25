@@ -10,12 +10,22 @@ const progressSchema = new mongoose.Schema({
   topic: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Topic',
-    required: true
+    required: false
   },
   track: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Track',
-    required: true
+    required: false
+  },
+  roadmap: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Roadmap',
+    required: false
+  },
+  // If roadmap is provided but not topic/track, we might just be tracking overall roadmap progress or a specific roadmap string topic
+  roadmapTopicSlug: {
+    type: String,
+    required: false
   },
   status: {
     type: String,
@@ -43,7 +53,8 @@ const progressSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
-// Ensure one progress record per user per topic
-progressSchema.index({ user: 1, topic: 1 }, { unique: true });
+// Ensure one progress record per user per topic or roadmap topic
+progressSchema.index({ user: 1, topic: 1 }, { unique: true, partialFilterExpression: { topic: { $exists: true } } });
+progressSchema.index({ user: 1, roadmap: 1, roadmapTopicSlug: 1 }, { unique: true, partialFilterExpression: { roadmap: { $exists: true }, roadmapTopicSlug: { $exists: true } } });
 
 module.exports = mongoose.model('Progress', progressSchema);

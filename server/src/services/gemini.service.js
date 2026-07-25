@@ -2,6 +2,7 @@ const ai = require('../config/gemini.config');
 const { buildTopicPrompt } = require('../prompts/topicContent.prompt');
 const { buildPracticeQuizPrompt } = require('../prompts/practiceQuiz.prompt');
 const { buildMockInterviewPrompt, buildInterviewFeedbackPrompt } = require('../prompts/mockInterview.prompt');
+const { buildRoadmapPrompt } = require('../prompts/roadmap.prompt');
 const ApiError = require('../utils/ApiError');
 const logger = require('../utils/logger');
 const env = require('../config/env.config');
@@ -22,6 +23,11 @@ class GeminiService {
 
   async generateMockInterviewQuestion(trackName, difficulty) {
     const prompt = buildMockInterviewPrompt(trackName, difficulty);
+    return this._generateJsonContent(prompt);
+  }
+
+  async generateRoadmap(role, difficulty) {
+    const prompt = buildRoadmapPrompt(role, difficulty);
     return this._generateJsonContent(prompt);
   }
 

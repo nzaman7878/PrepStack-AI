@@ -199,6 +199,15 @@ const generateMockInterviewQuestion = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, content, 'Mock interview question generated successfully'));
 });
 
+const generateRoadmap = asyncHandler(async (req, res) => {
+  const { role, difficulty = 'intermediate' } = req.body;
+  if (!role) throw new ApiError(400, 'Role is required to generate a roadmap');
+
+  const generationResult = await geminiService.generateRoadmap(role, difficulty);
+  
+  res.status(200).json(new ApiResponse(200, generationResult.content, 'Roadmap generated successfully'));
+});
+
 module.exports = {
   getCachedContent,
   clearCache,
@@ -207,5 +216,6 @@ module.exports = {
   updateContent,
   generateTopicContent,
   generateTopicPractice,
-  generateMockInterviewQuestion
+  generateMockInterviewQuestion,
+  generateRoadmap
 };

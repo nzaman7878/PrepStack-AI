@@ -185,4 +185,41 @@ export const generateAdminInterviewQuestion = async (trackSlug, difficulty = 'in
   return response.data.data;
 };
 
+// --- ROADMAP API ---
+export const getRoadmaps = async (all = false) => {
+  const response = await api.get(`/roadmaps${all ? '?all=true' : ''}`);
+  return response.data.data;
+};
+
+export const getRoadmap = async (slug) => {
+  const response = await api.get(`/roadmaps/${slug}`);
+  return response.data.data;
+};
+
+export const updateRoadmapProgress = async (roadmapId, topicSlug, status) => {
+  const response = await api.post(`/roadmaps/${roadmapId}/progress/${topicSlug}`, { status });
+  return response.data.data;
+};
+
+// --- ADMIN ROADMAP API ---
+export const generateAdminRoadmap = async (role, difficulty = 'intermediate') => {
+  const response = await api.post('/admin/generate/roadmap', { role, difficulty });
+  return response.data.data;
+};
+
+export const createRoadmap = async (data) => {
+  const response = await api.post('/roadmaps', data);
+  return response.data.data;
+};
+
+export const updateRoadmap = async (id, data) => {
+  const response = await api.put(`/roadmaps/${id}`, data);
+  return response.data.data;
+};
+
+export const deleteRoadmap = async (id) => {
+  const response = await api.delete(`/roadmaps/${id}`);
+  return response.data.data;
+};
+
 export default api;
