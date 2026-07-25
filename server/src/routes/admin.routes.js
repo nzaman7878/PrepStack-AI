@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { getCachedContent, clearCache } = require('../controllers/admin.controller');
+const { getCachedContent, clearCache, getContentById, createContent, updateContent } = require('../controllers/admin.controller');
 const { verifyJWT, authorizeRoles } = require('../middlewares/auth.middleware');
 
 const router = Router();
@@ -10,5 +10,10 @@ router.use(verifyJWT);
 
 router.route('/cache').get(getCachedContent);
 router.route('/cache/:id').delete(clearCache);
+
+router.route('/content').post(createContent);
+router.route('/content/:id')
+  .get(getContentById)
+  .put(updateContent);
 
 module.exports = router;

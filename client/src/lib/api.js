@@ -73,8 +73,45 @@ export const getTrack = async (slug) => {
   return response.data.data;
 };
 
+// Admin Track API
+export const createTrack = async (data) => {
+  const response = await api.post('/tracks', data);
+  return response.data.data;
+};
+
+export const updateTrack = async (id, data) => {
+  const response = await api.put(`/tracks/${id}`, data);
+  return response.data.data;
+};
+
+export const deleteTrack = async (id) => {
+  const response = await api.delete(`/tracks/${id}`);
+  return response.data.data;
+};
+
 export const getTopic = async (slug) => {
   const response = await api.get(`/topics/${slug}`);
+  return response.data.data;
+};
+
+// Admin Topic API
+export const getAllTopics = async () => {
+  const response = await api.get('/topics?all=true');
+  return response.data.data;
+};
+
+export const createTopic = async (data) => {
+  const response = await api.post('/topics', data);
+  return response.data.data;
+};
+
+export const updateTopic = async (id, data) => {
+  const response = await api.put(`/topics/${id}`, data);
+  return response.data.data;
+};
+
+export const deleteTopic = async (id) => {
+  const response = await api.delete(`/topics/${id}`);
   return response.data.data;
 };
 
@@ -115,6 +152,21 @@ export const getAdminCache = async () => {
 
 export const clearAdminCache = async (id = 'all') => {
   const response = await api.delete(`/admin/cache/${id}`);
+  return response.data.data;
+};
+
+export const getContentById = async (id) => {
+  const response = await api.get(`/admin/content/${id}`);
+  return response.data.data;
+};
+
+export const createContent = async (data) => {
+  const response = await api.post('/admin/content', data);
+  return response.data.data;
+};
+
+export const updateContent = async (id, data) => {
+  const response = await api.put(`/admin/content/${id}`, data);
   return response.data.data;
 };
 
